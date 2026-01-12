@@ -1,0 +1,142 @@
+import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+import random
+
+speed=4
+move=5
+move2=3
+
+x1=275
+x2=325
+x3=325
+x4=275
+
+locx=random.randint(20,580)
+locx2=random.randint(20,580)
+locx3=random.randint(20,580)
+
+y=0
+y2=0
+y3=0
+
+keyr=False
+keyl=False
+
+game_over=False
+
+score=0
+
+paused=False
+restart=False
+
+hit_green=False
+hit_red=False
+
+def restart_game():
+    global score, y, locx, game_over, game_over, paused, move, locx2, y2, move2, y3, locx3
+
+    paused=False
+    game_over=False
+    y=0
+    y2=0
+    y3=0
+    score=0
+    move=5
+    move2=3
+    game_over=False
+    locx=random.randint(20,580)
+    locx2=random.randint(20,580)
+    locx3=random.randint(20,580)
+
+def paused_game():
+    global paused
+    paused=not paused
+
+def draw_handler(canvas):
+    global y, locx, x1, x2, x3, x4, game_over, score, move, locx2, y2, move2, hit_green, hit_red, locx3, y3
+
+    if not game_over and not paused:
+
+        y+=move
+        y2+=move2
+        y3+move2
+    
+        if (x1<=locx+20<=x2 or x1<=locx-20<=x2) and (540<=y<=590):
+            score+=1
+            move=move+0.15
+            y=0
+            locx=random.randint(20,580)
+            hit_green=True
+
+        if (x1<=locx2-20<=x2 or x1<=locx2+20<=x2) and (540<=y2<=590):
+            hit_red=True
+            game_over=True
+        
+        if (x1<=locx3-20<=x2 or x1<=locx3+20<=x2) and (540<=y3<=590):
+            hit_red=True
+            game_over=True
+
+        if score>=10:
+            canvas.draw_circle(((locx3),y3),20,3,'black','red')
+            y3+=move2
+
+        if y3>580:
+            locx3=random.randint(20,580)
+            y3=0
+
+        if y2>580:
+            locx2=random.randint(20,580)
+            y2=0
+
+        if y>580:
+            game_over=True
+
+        if keyl:
+            x1-=speed
+            x2-=speed
+            x3-=speed
+            x4-=speed
+        if keyr:
+            x1+=speed
+            x2+=speed
+            x3+=speed
+            x4+=speed
+
+    canvas.draw_text('Score: '+str(score),(250,150),30,'black')  
+    canvas.draw_polygon([(x1,550),(x2,550),(x3,600),(x4,600)],3,'black','black')
+    canvas.draw_circle(((locx),y),20,3,'black','green')
+    canvas.draw_circle(((locx2),y2),20,3,'black','red')
+    canvas.draw_text('Pause = p',(500,20),20,'black')
+    canvas.draw_text('Restart = r',(500,40),20,'black')
+
+    if game_over==True:
+        canvas.draw_polygon([(x1,550),(x2,550),(x3,600),(x4,600)],3,'black','black')
+        canvas.draw_text('GAME OVER',(175,300),40,'red') 
+    elif paused==True:
+        canvas.draw_text('PAUSED',(250,300),40,'orange')
+
+def keyup(key):
+    global keyr, keyl
+
+    if key==simplegui.KEY_MAP['left'] or key ==simplegui.KEY_MAP['a']:
+        keyl=False
+    elif (key==simplegui.KEY_MAP['right'] or key==simplegui.KEY_MAP['d']):
+        keyr=False
+
+def keydown(key):
+    global keyl, keyr, paused, restart
+
+    if key == simplegui.KEY_MAP['left'] or key == simplegui.KEY_MAP['a']:
+        keyl = True
+    elif key == simplegui.KEY_MAP['right'] or key == simplegui.KEY_MAP['d']:
+        keyr = True
+    elif key == simplegui.KEY_MAP['p']:
+        paused=not paused
+    elif key == simplegui.KEY_MAP['r']:
+        restart_game()
+    
+frame = simplegui.create_frame('Falling Object Game', 600, 600, control_width=0)
+frame.set_canvas_background("white")
+frame.set_draw_handler(draw_handler)
+frame.set_keydown_handler(keydown)
+frame.set_keyup_handler(keyup)
+frame.start()
