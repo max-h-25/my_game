@@ -1,159 +1,175 @@
-#ball falling game developed by Max Heinle
+# ball falling game developed by Max Heinle
 import simplegui
 import random
 
-#movement speeds
-speed=4
-move=5
-move2=3
+# movement speeds
+player_speed = 4
+green_speed = 5
+red_speed = 3
 
-#location of square
-x1=275
-x2=325
-x3=325
-x4=275
+# location of square
+x1 = 275
+x2 = 325
+x3 = 325
+x4 = 275
 
-#location of all three balls
-locx=random.randint(20,580)
-locx2=random.randint(20,580)
-locx3=random.randint(20,580)
+# location of all three balls
+locx = random.randint(20, 580)
+locx2 = random.randint(20, 580)
+locx3 = random.randint(20, 580)
 
-y=0
-y2=0
-y3=0
+y = 0
+y2 = 0
+y3 = 0
 
-high_score=[]
+high_score = []
 
-keyr=False
-keyl=False
+keyr = False
+keyl = False
 
-game_over=False
-score_saved=False
+game_over = False
+score_saved = False
 
-score=0
+score = 0
 
-paused=False
-restart=False
+paused = False
+restart = False
 
-#what happens when player hits restart button
+
+# what happens when player hits restart button
 def restart_game():
-    global score, y, locx, game_over, paused, move, locx2, y2, move2, y3, locx3, high_score, score_saved
+    global score, y, y2, y3
+    global locx, locx2, locx3
+    global game_over, paused, green_speed, red_speed
+    global high_score, score_saved
 
-    paused=False
-    game_over=False
-    y=0
-    y2=0
-    y3=0
-    score=0
-    move=5
-    move2=3
-    game_over=False
-    score_saved=False
-    locx=random.randint(20,580)
-    locx2=random.randint(20,580)
-    locx3=random.randint(20,580)
+    paused = False
+    game_over = False
+    score_saved = False
 
-#what happens when player hits pause button
+    score = 0
+    green_speed = 5
+    red_speed = 3
+
+    y = 0
+    y2 = 0
+    y3 = 0
+
+    locx = random.randint(20, 580)
+    locx2 = random.randint(20, 580)
+    locx3 = random.randint(20, 580)
+
+
+# what happens when player hits pause button
 def paused_game():
     global paused
-    paused=not paused
+    paused = not paused
 
-#main gameplay
+
+# main gameplay
 def draw_handler(canvas):
-    global y, locx, x1, x2, x3, x4, game_over, score, move, locx2, y2, move2, locx3, y3, high_score, score_saved
+    global y, y2, y3
+    global locx, locx2, locx3
+    global x1, x2, x3, x4
+    global game_over, score, green_speed, red_speed
+    global high_score, score_saved
 
     if not game_over and not paused:
 
-        y+=move
-        y2+=move2
-        y3+=move2
-        #if box hits green ball, ball resets, a score is added, and the ball falls faster
-        if (x1<=locx+20<=x2 or x1<=locx-20<=x2) and (540<=y<=590):
-            score+=1
-            move=move+0.15
-            y=0
-            locx=random.randint(20,580)
-    
-        #if the red ball hits the box, the game is over
-        if (x1<=locx2-20<=x2 or x1<=locx2+20<=x2) and (540<=y2<=590):
-            game_over=True
-        #when score>=10, a second red ball spawns, and has the same properties as the first red ball
+        y += green_speed
+        y2 += red_speed
+        y3 += red_speed
+
+        # if box hits green ball, ball resets, a score is added, and the ball falls faster
+        if (x1 <= locx + 20 <= x2 or x1 <= locx - 20 <= x2) and (540 <= y <= 590):
+            score += 1
+            green_speed += 0.15
+            y = 0
+            locx = random.randint(20, 580)
+
+        # if the red ball hits the box, the game is over
+        if (x1 <= locx2 - 20 <= x2 or x1 <= locx2 + 20 <= x2) and (540 <= y2 <= 590):
+            game_over = True
+
+        # when score>=10, a second red ball spawns, and has the same properties as the first red ball
         if score >= 10:
-            if (x1<=locx3-20<=x2 or x1<=locx3+20<=x2) and (540<=y3<=590):
-                game_over=True
+            if (x1 <= locx3 - 20 <= x2 or x1 <= locx3 + 20 <= x2) and (540 <= y3 <= 590):
+                game_over = True
 
-        if score>=10:
-            canvas.draw_circle(((locx3),y3),20,3,'black','red')
-            
+        if score >= 10:
+            canvas.draw_circle((locx3, y3), 20, 3, 'black', 'red')
 
-        if y3>580:
-            locx3=random.randint(20,580)
-            y3=0
+        if y3 > 580:
+            locx3 = random.randint(20, 580)
+            y3 = 0
 
-        if y2>580:
-            locx2=random.randint(20,580)
-            y2=0
+        if y2 > 580:
+            locx2 = random.randint(20, 580)
+            y2 = 0
 
-        if y>580:
-            game_over=True
+        if y > 580:
+            game_over = True
 
-        #when speed is applied to the box
+        # when speed is applied to the box
         if keyl:
-            x1-=speed
-            x2-=speed
-            x3-=speed
-            x4-=speed
-        if keyr:
-            x1+=speed
-            x2+=speed
-            x3+=speed
-            x4+=speed
+            x1 -= player_speed
+            x2 -= player_speed
+            x3 -= player_speed
+            x4 -= player_speed
 
-    #drawings of every object, including text
-    canvas.draw_text('Score: '+str(score),(250,150),30,'black')  
-    canvas.draw_polygon([(x1,550),(x2,550),(x3,600),(x4,600)],3,'black','black')
-    canvas.draw_circle(((locx),y),20,3,'black','green')
-    canvas.draw_circle(((locx2),y2),20,3,'black','red')
-    canvas.draw_text('Pause = p',(500,20),20,'black')
-    canvas.draw_text('Restart = r',(500,40),20,'black')
-    
-    
-    #what happens when the game is over, or paused
-    
-    if game_over==True:
-        canvas.draw_polygon([(x1,550),(x2,550),(x3,600),(x4,600)],3,'black','black')
-        canvas.draw_text('GAME OVER',(175,300),40,'red')
+        if keyr:
+            x1 += player_speed
+            x2 += player_speed
+            x3 += player_speed
+            x4 += player_speed
+
+    # drawings of every object, including text
+    canvas.draw_text('Score: ' + str(score), (250, 150), 30, 'black')
+    canvas.draw_polygon([(x1, 550), (x2, 550), (x3, 600), (x4, 600)], 3, 'black', 'black')
+    canvas.draw_circle((locx, y), 20, 3, 'black', 'green')
+    canvas.draw_circle((locx2, y2), 20, 3, 'black', 'red')
+    canvas.draw_text('Pause = p', (500, 20), 20, 'black')
+    canvas.draw_text('Restart = r', (500, 40), 20, 'black')
+
+    # what happens when the game is over, or paused
+    if game_over:
+        canvas.draw_text('GAME OVER', (175, 300), 40, 'red')
         if not score_saved:
             high_score.append(score)
-            score_saved=True
-    elif paused==True:
-        canvas.draw_text('PAUSED',(250,300),40,'orange')
+            score_saved = True
+
+    elif paused:
+        canvas.draw_text('PAUSED', (250, 300), 40, 'orange')
 
     if high_score:
-        canvas.draw_text(f'High Score: {max(high_score)}', (210, 100), 30, 'black')
-#movement and game controls
+        canvas.draw_text('High Score: ' + str(max(high_score)), (210, 100), 30, 'black')
+
+
+# movement and game controls
 def keyup(key):
     global keyr, keyl
 
-    if key==simplegui.KEY_MAP['left'] or key ==simplegui.KEY_MAP['a']:
-        keyl=False
-    elif (key==simplegui.KEY_MAP['right'] or key==simplegui.KEY_MAP['d']):
-        keyr=False
+    if key == simplegui.KEY_MAP['left'] or key == simplegui.KEY_MAP['a']:
+        keyl = False
+    elif key == simplegui.KEY_MAP['right'] or key == simplegui.KEY_MAP['d']:
+        keyr = False
+
 
 def keydown(key):
-    global keyl, keyr, paused, restart
+    global keyl, keyr, paused
 
     if key == simplegui.KEY_MAP['left'] or key == simplegui.KEY_MAP['a']:
         keyl = True
     elif key == simplegui.KEY_MAP['right'] or key == simplegui.KEY_MAP['d']:
         keyr = True
     elif key == simplegui.KEY_MAP['p']:
-        paused=not paused
+        paused = not paused
     elif key == simplegui.KEY_MAP['r']:
         restart_game()
-    
-#frame creator
-frame = simplegui.create_frame('Game', 600, 600,0)
+
+
+# frame creator
+frame = simplegui.create_frame('Game', 600, 600, 0)
 frame.set_canvas_background("White")
 frame.set_draw_handler(draw_handler)
 frame.set_keydown_handler(keydown)
